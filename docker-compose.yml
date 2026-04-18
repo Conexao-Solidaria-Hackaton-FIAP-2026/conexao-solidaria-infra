@@ -1,0 +1,104 @@
+version: '3.9'
+
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "C0nexao$olidaria2026"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "C0nexao$olidaria2026" -Q "SELECT 1" -No
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  campaigns-api:
+    profiles: ["app"]
+    build:
+      context: ../conexao-solidaria-campaigns-api
+      dockerfile: Dockerfile
+    container_name: campaigns-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=CampaignsDb;User Id=sa;Password=C0nexao$olidaria2026;TrustServerCertificate=True"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+      JWT__Key: "super-secret-jwt-key-for-development-only-32c"
+      JWT__Issuer: "ConexaoSolidaria"
+      JWT__Audience: "ConexaoSolidaria"
+    ports:
+      - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  donation-worker:
+    profiles: ["app"] 
+    build:
+      context: ../conexao-solidaria-donation-worker
+      dockerfile: Dockerfile
+    container_name: donation-worker
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=CampaignsDb;User Id=sa;Password=C0nexao$olidaria2026;TrustServerCertificate=True"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+volumes:
+  sqlserver_data:
+  grafana_data:

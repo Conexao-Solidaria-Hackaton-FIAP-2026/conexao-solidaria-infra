@@ -1,0 +1,78 @@
+{
+  "title": "Conexao Solidaria",
+  "uid": "conexao-solidaria-main",
+  "schemaVersion": 38,
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Requisicoes HTTP - campaigns-api (req/s)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "rate(http_requests_received_total{job=\"campaigns-api\"}[1m])",
+        "legendFormat": "{{method}} {{path}}"
+      }]
+    },
+    {
+      "id": 2,
+      "title": "Doacoes processadas pelo worker",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "targets": [{
+        "expr": "worker_doacoes_processadas_total",
+        "legendFormat": "Total processadas"
+      }]
+    },
+    {
+      "id": 3,
+      "title": "Erros no worker",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "targets": [{
+        "expr": "worker_doacoes_erro_total",
+        "legendFormat": "Total erros"
+      }]
+    },
+    {
+      "id": 4,
+      "title": "CPU - campaigns-api",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "rate(process_cpu_seconds_total{job=\"campaigns-api\"}[1m]) * 100",
+        "legendFormat": "CPU %"
+      }]
+    },
+    {
+      "id": 5,
+      "title": "CPU - donation-worker",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "rate(process_cpu_seconds_total{job=\"donation-worker\"}[1m]) * 100",
+        "legendFormat": "CPU %"
+      }]
+    },
+    {
+      "id": 6,
+      "title": "Memoria - campaigns-api (MB)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "dotnet_total_memory_bytes{job=\"campaigns-api\"} / 1024 / 1024",
+        "legendFormat": "Heap MB"
+      }]
+    },
+    {
+      "id": 7,
+      "title": "Memoria - donation-worker (MB)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "dotnet_total_memory_bytes{job=\"donation-worker\"} / 1024 / 1024",
+        "legendFormat": "Heap MB"
+      }]
+    }
+  ]
+}

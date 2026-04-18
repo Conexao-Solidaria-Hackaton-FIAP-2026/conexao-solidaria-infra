@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: donation-worker
+  namespace: conexao-solidaria
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: donation-worker
+  template:
+    metadata:
+      labels:
+        app: donation-worker
+    spec:
+      containers:
+        - name: donation-worker
+          image: donation-worker:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9091
+          envFrom:
+            - configMapRef:
+                name: donation-worker-config

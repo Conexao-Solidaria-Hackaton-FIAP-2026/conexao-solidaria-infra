@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: campaigns-api-config
+  namespace: conexao-solidaria
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ASPNETCORE_URLS: "http://+:8080"
+  RabbitMQ__Host: "rabbitmq-svc"
+  RabbitMQ__Username: "guest"
+  RabbitMQ__Password: "guest"
+  JWT__Issuer: "ConexaoSolidaria"
+  JWT__Audience: "ConexaoSolidaria"
+  JWT__Key: "super-secret-jwt-key-for-development-only-32c"
+  ConnectionStrings__DefaultConnection: "Server=sqlserver-svc,1433;Database=CampaignsDb;User Id=sa;Password=C0nexao$olidaria2026;TrustServerCertificate=True"

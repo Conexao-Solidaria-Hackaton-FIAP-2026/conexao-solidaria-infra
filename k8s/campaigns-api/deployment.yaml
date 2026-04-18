@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campaigns-api
+  namespace: conexao-solidaria
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: campaigns-api
+  template:
+    metadata:
+      labels:
+        app: campaigns-api
+    spec:
+      containers:
+        - name: campaigns-api
+          image: campaigns-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: campaigns-api-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 20

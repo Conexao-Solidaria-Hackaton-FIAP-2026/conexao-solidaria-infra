@@ -1,0 +1,7 @@
+# Grafana dados persistidos localmente
+grafana/data/
+
+# Docker volumes locais
+.docker/
+
+.vs/

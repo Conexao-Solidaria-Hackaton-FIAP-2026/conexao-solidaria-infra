@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\dockerfiles",
+    "\\grafana",
+    "\\grafana\\dashboards",
+    "\\grafana\\datasources",
+    "\\k8s"
+  ],
+  "SelectedNode": "\\docker-compose.yml",
+  "PreviewInSolutionExplorer": false
+}

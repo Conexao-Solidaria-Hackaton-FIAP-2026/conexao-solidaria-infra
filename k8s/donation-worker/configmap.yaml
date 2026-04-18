@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: donation-worker-config
+  namespace: conexao-solidaria
+data:
+  RabbitMQ__Host: "rabbitmq-svc"
+  RabbitMQ__Username: "guest"
+  RabbitMQ__Password: "guest"
+  ConnectionStrings__DefaultConnection: "Server=sqlserver-svc,1433;Database=CampaignsDb;User Id=sa;Password=C0nexao$olidaria2026;TrustServerCertificate=True"
