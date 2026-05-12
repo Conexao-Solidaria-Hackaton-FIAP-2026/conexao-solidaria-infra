@@ -20,7 +20,7 @@ spec:
             - containerPort: 1433
           env:
             - name: SA_PASSWORD
-              value: "C0nexao$olidaria2026"
+              value: "ConexaoSolidaria2026"
             - name: ACCEPT_EULA
               value: "Y"
           resources:

@@ -1,19 +1,17 @@
-version: '3.9'
-
 services:
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
     environment:
-      SA_PASSWORD: "C0nexao$$olidaria2026"
+      SA_PASSWORD: "ConexaoSolidaria2026"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
     healthcheck:
-      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "C0nexao$$olidaria2026" -Q "SELECT 1" -No
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "ConexaoSolidaria2026" -Q "SELECT 1" -No
       interval: 10s
       timeout: 5s
       retries: 15
@@ -34,21 +32,22 @@ services:
       retries: 10
 
   campaigns-api:
-    profiles: ["app"]
     build:
-      context: ../conexao-solidaria-campaigns-api
+      context: ../conexao-solidaria-api
       dockerfile: Dockerfile
     container_name: campaigns-api
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=CampaignsDb;User Id=sa;Password=C0nexao$$olidaria2026;TrustServerCertificate=True"
-      RabbitMQ__Host: rabbitmq
-      RabbitMQ__Username: guest
-      RabbitMQ__Password: guest
-      JWT__Key: "super-secret-jwt-key-for-development-only-32c"
-      JWT__Issuer: "ConexaoSolidaria"
-      JWT__Audience: "ConexaoSolidaria"
+      ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=ConexaoSolidaria;User Id=sa;Password=ConexaoSolidaria2026;TrustServerCertificate=True"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Port: "5672"
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+      Jwt__SecretKey: "super-secret-jwt-key-for-development-only-32c"
+      Jwt__Issuer: "ConexaoSolidaria"
+      Jwt__Audience: "ConexaoSolidaria"
+      Database__AutoMigrate: "true"
     ports:
       - "8080:8080"
     depends_on:
@@ -58,13 +57,12 @@ services:
         condition: service_healthy
 
   donation-worker:
-    profiles: ["app"] 
     build:
       context: ../conexao-solidaria-donation-worker
       dockerfile: Dockerfile
     container_name: donation-worker
     environment:
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=CampaignsDb;User Id=sa;Password=C0nexao$$olidaria2026;TrustServerCertificate=True"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=ConexaoSolidaria;User Id=sa;Password=ConexaoSolidaria2026;TrustServerCertificate=True"
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Username: guest
       RabbitMQ__Password: guest
